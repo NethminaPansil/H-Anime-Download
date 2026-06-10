@@ -3,52 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VORTEX - Next Gen Digital Experience</title>
+    <title>VORTEX - Premium Anime Downloader</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-    <div class="bg-blur circle-1"></div>
-    <div class="bg-blur circle-2"></div>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
 
     <nav class="navbar">
         <div class="logo">VORTEX<span>.</span></div>
-        <ul class="nav-links">
-            <li><a href="#" class="active">Home</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-        <button class="btn btn-secondary">Launch App</button>
+        <div class="nav-status">Backend Status: <span class="status-online">● Online</span></div>
     </nav>
 
-    <header class="hero-section">
-        <div class="hero-content">
-            <span class="badge">Welcome to the Future</span>
-            <h1>The Next Generation <br><span class="text-gradient">Digital Experience</span></h1>
-            <p>Vortex provides cutting-edge tech solutions to scale your business into the digital cosmos. Fast, secure, and infinitely scalable.</p>
+    <main class="container">
+        <div class="hero-section">
+            <span class="badge">Advanced Anime Link Extractor</span>
+            <h1>Stream & Download <br><span class="text-gradient">Limitless Content</span></h1>
+            <p>Paste your favorite anime video URL below to fetch high-speed direct download and streaming links instantly via Vortex Core VPS.</p>
+        </div>
+
+        <div class="downloader-box">
+            <div class="input-group">
+                <input type="text" id="videoUrl" placeholder="Enter Hanime or HentaiHaven URL here...">
+                <button class="btn-main" onclick="startDownload()">Extract Link</button>
+            </div>
             
-            <div class="cta-buttons">
-                <button class="btn btn-primary">Get Started <i class="fas fa-arrow-right"></i></button>
-                <button class="btn btn-outline">Learn More</button>
-            </div>
+            <div id="statusMessage" class="status-area"></div>
         </div>
+    </main>
 
-        <div class="hero-card">
-            <h3>Vortex Core v1.0</h3>
-            <div class="stat-row">
-                <span>Status:</span> <span class="status-online">● Online</span>
+    <script>
+    async function startDownload() {
+        const url = document.getElementById('videoUrl').value.trim();
+        const status = document.getElementById('statusMessage');
+        
+        if(!url) {
+            status.innerHTML = `<p class="error-text">❌ කරුණාකර නිවැරදි URL එකක් ඇතුළත් කරන්න!</p>`;
+            status.classList.add('active');
+            return;
+        }
+        
+        // Loader Animation
+        status.innerHTML = `
+            <div class="loader-container">
+                <div class="spinner"></div>
+                <p>Connecting to Vortex VPS... Fetching direct streams.</p>
             </div>
-            <div class="stat-row">
-                <span>Speed:</span> <span>99.9 Gb/s</span>
-            </div>
-            <div class="stat-row">
-                <span>Security:</span> <span>End-to-End</span>
-            </div>
-        </div>
-    </header>
-
+        `;
+        status.classList.add('active');
+        
+        try {
+            // ⚠️ 'ඔයාගේ_VPS_IP_එක' වෙනුවට ඔයාගේ සැබෑ VPS IP එක අනිවාර්යයෙන්ම දාන්න
+            const response = await fetch('http://178.128.104.155:5000/api/get-download-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url })
+            });
+            
+            const data = await response.json();
+            
+            if(data.success) {
+                status.innerHTML = `
+                    <div class="result-card">
+                        <div class="result-info">
+                            <h4>🎉 Link Extracted Successfully!</h4>
+                            <p class="video-title"><strong>Title:</strong> ${data.title}</p>
+                        </div>
+                        <a href="${data.download_url}" target="_blank" class="btn-download">
+                            🚀 High-Speed Download / Play
+                        </a>
+                    </div>
+                `;
+            } else {
+                status.innerHTML = `<p class="error-text">❌ Error: ${data.error}</p>`;
+            }
+        } catch (error) {
+            status.innerHTML = `
+                <p class="error-text">❌ Backend සර්වර් එක සම්බන්ධ කර ගැනීමට නොහැකි වුණා!</p>
+                <span style="font-size:12px; color:#aaa; display:block; margin-top:5px;">
+                    (ඔයාගේ Browser එකේ Site Settings වලින් <b>Insecure Content -> Allow</b> කරලා තියෙනවාදැයි බලන්න).
+                </span>
+            `;
+        }
+    }
+    </script>
 </body>
 </html>
